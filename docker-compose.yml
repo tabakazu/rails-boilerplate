@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  base: &base
+    build: .
+    stdin_open: true
+    tty: true
+
+  rails:
+    <<: *base
+    command: bash -c "rm -f tmp/pids/server.pid && rails s -b '0.0.0.0'"
+    environment:
+      - DATABASE_URL=mysql2://root:@mysql:3306
+      - DEFAULT_HOST=localhost:3000
+    volumes:
+      - .:/myapp:cached
+      - rails_cache:/myapp/tmp/cache
+      - bundle:/bundle
+      - node_modules:/myapp/node_modules
+      - packs:/myapp/public/packs
+      - /myapp/tmp/pids
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mysql
+
+  webpacker:
+    <<: *base
+    command: ./bin/webpack-dev-server
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - RAILS_ENV=${RAILS_ENV:-development}
+      - WEBPACKER_DEV_SERVER_HOST=0.0.0.0
+    volumes:
+      - .:/myapp:cached
+      - bundle:/bundle
+      - node_modules:/myapp/node_modules
+      - packs:/myapp/public/packs
+    ports:
+      - '3035:3035'
+
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+
+volumes:
+  mysql_data:
+  bundle:
+  node_modules:
+  rails_cache:
+  packs:
