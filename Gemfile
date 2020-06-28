@@ -15,6 +15,8 @@ gem 'webpacker', '~> 4.0'
 
 gem 'bootsnap', '>= 1.4.2', require: false
 
+gem 'config'
+
 group :development, :test do
   gem 'factory_bot_rails'
   gem 'pry-byebug'
