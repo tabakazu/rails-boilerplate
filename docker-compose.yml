@@ -1,43 +1,40 @@
 version: '3.8'
 
 services:
-  base: &base
+  rails: &rails
+    working_dir: /myapp
     build: .
+    command: bash -c "rm -f tmp/pids/server.pid && rails s -b '0.0.0.0'"
     stdin_open: true
     tty: true
-
-  rails:
-    <<: *base
-    command: bash -c "rm -f tmp/pids/server.pid && rails s -b '0.0.0.0'"
     environment:
-      - DATABASE_URL=mysql2://root:@mysql:3306
-      - DEFAULT_HOST=localhost:3000
+      RAILS_ENV: ${RAILS_ENV:-development}
+      NODE_ENV: ${NODE_ENV:-development}
+      MYSQL_URL: mysql2://root:@mysql:3306
+      WEBPACKER_DEV_SERVER_HOST: webpacker
+      WEBPACKER_DEV_SERVER_PUBLIC: 0.0.0.0:3035
+      DEFAULT_HOST: localhost:3000
     volumes:
       - .:/myapp:cached
       - rails_cache:/myapp/tmp/cache
-      - bundle:/bundle
-      - node_modules:/myapp/node_modules
-      - packs:/myapp/public/packs
+      - rails_bundle:/bundle
+      - rails_node_modules:/myapp/node_modules
+      - rails_packs:/myapp/public/packs
       - /myapp/tmp/pids
     ports:
       - '3000:3000'
     depends_on:
       - mysql
+      - webpacker
+    tmpfs:
+      - /tmp
 
   webpacker:
-    <<: *base
+    <<: *rails
     command: ./bin/webpack-dev-server
-    environment:
-      - NODE_ENV=${NODE_ENV:-development}
-      - RAILS_ENV=${RAILS_ENV:-development}
-      - WEBPACKER_DEV_SERVER_HOST=0.0.0.0
-    volumes:
-      - .:/myapp:cached
-      - bundle:/bundle
-      - node_modules:/myapp/node_modules
-      - packs:/myapp/public/packs
     ports:
       - '3035:3035'
+    depends_on: []
 
   mysql:
     image: mysql:8.0
@@ -46,11 +43,15 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=1
     volumes:
       - mysql_data:/var/lib/mysql
-    restart: always
 
 volumes:
-  mysql_data:
-  bundle:
-  node_modules:
   rails_cache:
-  packs:
+    driver: local
+  rails_bundle:
+    driver: local
+  rails_node_modules:
+    driver: local
+  rails_packs:
+    driver: local
+  mysql_data:
+    driver: local

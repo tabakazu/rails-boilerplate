@@ -2,7 +2,7 @@ default: &default
   adapter: mysql2
   encoding: utf8mb4
   pool: <%= ENV.fetch('RAILS_MAX_THREADS') { 5 } %>
-  url: <%= ENV['DATABASE_URL'] %>
+  url: <%= ENV['MYSQL_URL'] %>
 
 development:
   <<: *default
@@ -14,4 +14,4 @@ test:
 
 production:
   <<: *default
-  database: <%= ENV['DATABASE_NAME'] %>
+  database: <%= ENV['MYSQL_DATABASE_NAME'] %>
