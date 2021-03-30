@@ -1,4 +1,4 @@
-FROM ruby:2.7.1
+FROM ruby:2.7.2
 
 ENV LANG ja_JP.utf8
 ENV GEM_HOME /bundle
