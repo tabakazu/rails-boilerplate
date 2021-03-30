@@ -10,10 +10,9 @@ services:
     environment:
       RAILS_ENV: ${RAILS_ENV:-development}
       NODE_ENV: ${NODE_ENV:-development}
-      MYSQL_URL: mysql2://root:@mysql:3306
-      WEBPACKER_DEV_SERVER_HOST: webpacker
-      WEBPACKER_DEV_SERVER_PUBLIC: 0.0.0.0:3035
+      BUNDLE_APP_CONFIG: ./.bundle
       DEFAULT_HOST: localhost:3000
+      MYSQL_URL: mysql2://root:@mysql:3306
     volumes:
       - .:/myapp:cached
       - rails_cache:/myapp/tmp/cache
@@ -25,16 +24,21 @@ services:
       - '3000:3000'
     depends_on:
       - mysql
-      - webpacker
     tmpfs:
       - /tmp
 
   webpacker:
     <<: *rails
     command: ./bin/webpack-dev-server
+    environment:
+      RAILS_ENV: ${RAILS_ENV:-development}
+      NODE_ENV: ${NODE_ENV:-development}
+      BUNDLE_APP_CONFIG: ./.bundle
+      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
     ports:
       - '3035:3035'
-    depends_on: []
+    depends_on:
+      - rails
 
   mysql:
     image: mysql:8.0
