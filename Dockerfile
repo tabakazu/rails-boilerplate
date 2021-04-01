@@ -16,8 +16,8 @@ RUN set -x && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - 
     echo 'deb http://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list
 
 RUN set -x && apt-get update -qq && \
-  apt-get install -yq build-essential nodejs yarn vim default-mysql-client
+  apt-get install -yq build-essential nodejs yarn default-mysql-client
 
-RUN set -x && gem update --system && gem install bundler:2.1.4
+RUN set -x && gem update --system && gem install bundler:2.2.15
 
 RUN mkdir -p /myapp
