@@ -10,7 +10,7 @@ ENV BUNDLE_BIN $BUNDLE_PATH/bin
 ENV PATH /app/bin:$BUNDLE_BIN:$PATH
 
 # https://github.com/nodesource/distributions/blob/master/README.md
-RUN set -x && curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN set -x && curl -sL https://deb.nodesource.com/setup_15.x | bash -
 
 RUN set -x && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo 'deb http://dl.yarnpkg.com/debian/ stable main' > /etc/apt/sources.list.d/yarn.list
