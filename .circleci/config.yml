@@ -1,0 +1,59 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      # Ruby コンテナの設定
+      - image: circleci/ruby:2.7.2
+        environment:
+          RAILS_ENV: test
+          MYSQL_URL: mysql2://root:root@127.0.0.1:3306
+      # MySQL コンテナの設定
+      - image: mysql:8.0
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+          MYSQL_ROOT_PASSWORD: root
+    steps:
+      # ソースコードのチェックアウトに用いる特殊なステップ
+      - checkout
+      # 依存 Gem のインストールステップ
+      - run:
+          name: Install dependent Gems
+          command: |
+            bundle install --path=vendor/bundle --jobs 4 --retry 3
+      # Node.js のインストールステップ
+      - run:
+          name: Install Node.js
+          command: |
+            curl -sL https://deb.nodesource.com/setup_15.x | sudo -E bash -
+            curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+            sudo apt update -y
+            sudo apt install -y nodejs yarn
+      # MySQL クライアントのインストールステップ
+      - run:
+          name: Install MySQL client
+          command: |
+            sudo apt update -y
+            sudo apt install -y default-mysql-client
+      # Rails で DB のセットアップステップ
+      - run:
+          name: Setup database with Rails
+          command: |
+            bundle exec rails db:create
+            bundle exec rails db:schema:load
+      # Webpack のセットアップステップ
+      - run:
+          name: Setup webpack
+          command: |
+            yarn
+            bin/webpack
+      # RSpec の実行ステップ
+      - run:
+          name: Run RSpec
+          command: |
+            bundle exec rspec
+      # RuboCop の実行ステップ
+      - run:
+          name: Run RuboCop
+          command: |
+            bundle exec rubocop
