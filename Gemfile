@@ -6,7 +6,7 @@ ruby '2.7.3'
 gem 'rails', '~> 6.0.3', '>= 6.0.3.2'
 
 gem 'mysql2', '>= 0.4.4'
-gem 'puma', '~> 4.1'
+gem 'puma', '~> 4.3'
 
 gem 'activerecord-session_store'
 gem 'config'
